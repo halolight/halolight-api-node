@@ -83,7 +83,7 @@ halolight-api-node/
 ```typescript
 // POST /api/auth/login
 {
-  "email": "admin@example.com",
+  "email": "admin@halolight.h7ml.cn",
   "password": "password123"
 }
 
@@ -92,7 +92,7 @@ halolight-api-node/
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "user": {
     "id": "1",
-    "email": "admin@example.com",
+    "email": "admin@halolight.h7ml.cn",
     "name": "Admin"
   }
 }
@@ -107,7 +107,7 @@ halolight-api-node/
 // Response
 {
   "data": [
-    { "id": "1", "email": "admin@example.com", "name": "Admin" }
+    { "id": "1", "email": "admin@halolight.h7ml.cn", "name": "Admin" }
   ],
   "total": 100,
   "page": 1,
