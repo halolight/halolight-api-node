@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: halolight-postgres
+    restart: unless-stopped
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-halolight}
+      POSTGRES_USER: ${POSTGRES_USER:-halolight}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-halolight_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-halolight}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # 如果使用外部数据库，注释掉整个 postgres 服务
+
+  # API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: halolight-api-node
+    restart: unless-stopped
+    ports:
+      - '${PORT:-3001}:3001'
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-halolight}:${POSTGRES_PASSWORD:-halolight_password}@postgres:5432/${POSTGRES_DB:-halolight}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-30d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
+
+volumes:
+  postgres_data:
+
+# 共享数据库场景：
+# 1. 注释掉 postgres 服务
+# 2. 修改 DATABASE_URL 指向外部数据库
+# 3. 移除 depends_on
