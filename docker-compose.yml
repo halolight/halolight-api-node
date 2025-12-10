@@ -27,6 +27,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: halolight-api-node
+    env_file:
+      - .env.docker
     restart: unless-stopped
     ports:
       - '${PORT:-3001}:3001'
@@ -42,7 +44,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "npx prisma generate && npx prisma migrate deploy && node dist/index.js"
+    command: sh -c "pnpm prisma generate && pnpm prisma migrate deploy && node dist/index.js"
 
 volumes:
   postgres_data:
