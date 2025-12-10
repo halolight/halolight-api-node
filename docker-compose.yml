@@ -4,10 +4,10 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: halolight-postgres
+    container_name: halolight-postgres-node
     restart: unless-stopped
     ports:
-      - '${POSTGRES_PORT:-5432}:5432'
+      - '${POSTGRES_PORT:-5433}:5432'
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-halolight}
       POSTGRES_USER: ${POSTGRES_USER:-halolight}
@@ -42,7 +42,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "npx prisma migrate deploy && node dist/index.js"
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && node dist/index.js"
 
 volumes:
   postgres_data:
